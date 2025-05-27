@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>To do</h3>
+    <ul id="taskList" style="list-style-type: none; padding-left: 0;"></ul>
+    <form>
+        <input id="task" placeholder="Enter a new task">
+        </br>
+        <button style="margin-top: 20px" onclick="addTask()">Add Task</button>
+    </form>
+    <script>
+        const baseUrl = "http://localhost:3000";
+
+        async function addTask() {
+            try {
+                const taskInput = document.getElementById('task');
+                const task = taskInput.value.trim();
+
+                if (!task) {
+                    alert('Please enter a task!');
+                    return;
+                }
+
+                const response = await fetch(`${baseUrl}/task`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: task,
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add task' + response.status);
+                }
+
+                // alert("New task added");
+
+                task = '';
+                fetchTask();
+            } catch (e) {
+                alert(e);
+            }
+        }
+
+        async function fetchTask() {
+            try {
+                response = await fetch(`${baseUrl}/task`);
+                tasks = await response.json();
+
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.textContent = `${task.text}`;
+                    taskList.appendChild(li);
+                })
+            } catch (e) {
+                alert("Cannot fetch your tasks at the moment");
+            }
+        }
+
+        fetchTask();
+    </script>
+</body>
+
+</html>
